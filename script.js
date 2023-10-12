@@ -16,20 +16,12 @@ window.onload = () => {
 
   function onRun() {
     (function () {
-      var D = document,
-        B = D.body,
-        H,
-        S,
-        ORG = B.innerHTML;
-
-      var scrollTopLength = function () {
-        return D.documentElement.scrollTop || B.scrollTop;
-      };
-      var positionY = scrollTopLength() + 10;
+      let H;
+      const ORG = document.body.innerHTML;
 
       //Marker class (prototype)
       /*-------------------------------------------------------------------*/
-      var Marker = function (id, text, textType, color) {
+      const Marker = function (id, text, textType, color) {
         this.initialize(id, text, textType, color);
       };
       Marker.prototype = {
@@ -38,17 +30,17 @@ window.onload = () => {
           this.text = text;
           this.textType = textType;
           this.color = color;
-          this.check = D.createElement("input");
+          this.check = document.createElement("input");
           this.check.id = id;
           this.check.type = "checkbox";
           this.check.value = textType;
-          this.label = D.createElement("label");
+          this.label = document.createElement("label");
           this.label.setAttribute("for", id);
           this.label.innerHTML = text;
-          this.elem = D.createElement("p");
+          this.elem = document.createElement("p");
           this.elem.appendChild(this.check);
           this.elem.appendChild(this.label);
-          var self = this;
+          const self = this;
           this.check.onclick = function () {
             if (this.checked) {
               self.markOn();
@@ -58,13 +50,13 @@ window.onload = () => {
           };
         },
         markOn: function (id, text, textType, color) {
-          var self = this;
-          var s = "[REOP-array-separator]",
+          const self = this;
+          const separator = "[REOP-array-separator]",
             t = H.innerHTML
-              .replace(new RegExp("(<)", "ig"), s + "$1")
-              .replace(new RegExp("(>)", "ig"), "$1" + s)
-              .split(s);
-          for (var i = 0; i < t.length; i++) {
+              .replace(new RegExp("(<)", "ig"), separator + "$1")
+              .replace(new RegExp("(>)", "ig"), "$1" + separator)
+              .split(separator);
+          for (let i = 0; i < t.length; i++) {
             if (t[i].substr(0, 1) == "<") {
               //do nothing for HTML tags
             } else {
@@ -72,10 +64,13 @@ window.onload = () => {
                 i,
                 1,
                 t[i]
-                  .replace(new RegExp("(&.{2,4};)", "ig"), s + "$1" + s)
-                  .split(s)
+                  .replace(
+                    new RegExp("(&.{2,4};)", "ig"),
+                    separator + "$1" + separator
+                  )
+                  .split(separator)
               );
-              for (var j = 0; j < t[i].length; j++) {
+              for (let j = 0; j < t[i].length; j++) {
                 if (t[i][j].substr(0, 1) != "&") {
                   t[i][j] = t[i][j].replace(
                     new RegExp("(" + self.textType + ")", "ig"),
@@ -89,7 +84,7 @@ window.onload = () => {
           H.innerHTML = t.join("");
         },
         markOff: function (id, text, textType, color) {
-          var self = this;
+          const self = this;
           H.innerHTML = H.innerHTML.replace(
             new RegExp(
               '<span class="' + self.id + '">(' + self.textType + ")</span>",
@@ -99,7 +94,7 @@ window.onload = () => {
           );
         },
       };
-      var patterns = [];
+      const patterns = [];
       patterns[0] = new Marker("REOP1", "アルファベット", "[a-z]+", "#9f9");
       patterns[1] = new Marker("REOP2", "カタカナ", "[ァ-タダ-ヶー]+", "#99f");
       patterns[2] = new Marker("REOP3", "半角スペース", " +", "#f99");
@@ -108,34 +103,34 @@ window.onload = () => {
 
       //Panel class (constructor)
       /*-------------------------------------------------------------------*/
-      var Panel = function () {
-        this.elem = D.createElement("div");
+      const Panel = function () {
+        this.elem = document.createElement("div");
         this.elem.className = "REOP-ctrl movable";
         this.create = function () {
-          var self = this;
-          S = D.createElement("style");
-          S.setAttribute("id", "REOP-style");
-          for (var i = 0; i < patterns.length; i++) {
-            S.innerHTML +=
+          const self = this;
+          const styleElm = document.createElement("style");
+          styleElm.setAttribute("id", "REOP-style");
+          for (let i = 0; i < patterns.length; i++) {
+            styleElm.innerHTML +=
               "span." +
               patterns[i].id +
               "{background:" +
               patterns[i].color +
               ";}";
           }
-          S.innerHTML +=
-            ".REOP-ctrl{position:fixed;top:" +
-            positionY +
-            "px;right:10px;z-index:9998;width:200px;padding:0 10px 10px;text-align:left;color:#fff;background:#000;opacity:0.7;box-shadow: 0 3px 7px rgba(0, 0, 0, 0.6);border-radius:3px;}";
-          S.innerHTML +=
+          styleElm.innerHTML +=
+            ".REOP-ctrl{position:fixed;top:10px;right:10px;z-index:9998;width:200px;padding:0 10px 10px;text-align:left;color:#fff;background:#000;opacity:0.7;box-shadow: 0 3px 7px rgba(0, 0, 0, 0.6);border-radius:3px;}";
+          styleElm.innerHTML +=
             ".REOP-ctrl p{margin:5px 0;}.REOP-ctrl input,.REOP-ctrl label{margin-right:5px;vertical-align:middle;}";
-          S.innerHTML +=
+          styleElm.innerHTML +=
             ".REOP-ctrl div{margin:0 -10px 10px;padding:2px;background:#333;cursor:move;text-align:right;border-radius:3px;}.REOP-ctrl span{cursor:pointer;}";
-          D.head.appendChild(S);
-          B.innerHTML =
-            '<div id="REOP-HighLightArea">' + B.innerHTML + "</div>";
-          H = D.getElementById("REOP-HighLightArea");
-          B.insertBefore(self.elem, H);
+          document.head.appendChild(styleElm);
+          document.body.innerHTML =
+            '<div id="REOP-HighLightArea">' +
+            document.body.innerHTML +
+            "</div>";
+          H = document.getElementById("REOP-HighLightArea");
+          document.body.insertBefore(self.elem, H);
           self.elem.innerHTML =
             '<div class="movable_controller"><span id="REOP-close">閉じる</span></div>';
           for (var i = 0; i < patterns.length; i++) {
@@ -143,25 +138,25 @@ window.onload = () => {
           }
         };
         this.remove = function () {
-          D.getElementById("REOP-close").onclick = function () {
-            D.head.removeChild(D.getElementById("reop"));
-            D.head.removeChild(D.getElementById("REOP-style"));
-            B.innerHTML = ORG;
+          document.getElementById("REOP-close").onclick = function () {
+            document.head.removeChild(document.getElementById("reop"));
+            document.head.removeChild(document.getElementById("REOP-style"));
+            document.body.innerHTML = ORG;
           };
         };
       };
-      var panel = new Panel();
+      const panel = new Panel();
       panel.create();
       panel.remove();
 
       //ElementMover
       /*-------------------------------------------------------------------*/
       (function () {
-        var s = D.createElement("script");
+        const s = document.createElement("script");
         s.setAttribute("type", "text/javascript");
         s.setAttribute("charset", "utf-8");
         s.setAttribute("src", "element_mover-1.0.js");
-        B.appendChild(s);
+        document.body.appendChild(s);
       })();
     })();
   }
