@@ -16,24 +16,27 @@ window.onload = () => {
 
   function onRun() {
     (function () {
-      let H;
       const ORG = document.body.innerHTML;
+
+      document.body.innerHTML =
+        '<div id="REOP-HighLightArea">' + document.body.innerHTML + "</div>";
+      let editedHTML = document.getElementById("REOP-HighLightArea");
 
       //Marker class (prototype)
       /*-------------------------------------------------------------------*/
-      const Marker = function (id, text, textType, color) {
-        this.initialize(id, text, textType, color);
+      const Marker = function (id, text, regexpPattern, color) {
+        this.initialize(id, text, regexpPattern, color);
       };
       Marker.prototype = {
-        initialize: function (id, text, textType, color) {
+        initialize: function (id, text, regexpPattern, color) {
           this.id = id;
           this.text = text;
-          this.textType = textType;
+          this.regexpPattern = regexpPattern;
           this.color = color;
           this.check = document.createElement("input");
           this.check.id = id;
           this.check.type = "checkbox";
-          this.check.value = textType;
+          this.check.value = regexpPattern;
           this.label = document.createElement("label");
           this.label.setAttribute("for", id);
           this.label.innerHTML = text;
@@ -49,45 +52,50 @@ window.onload = () => {
             }
           };
         },
-        markOn: function (id, text, textType, color) {
+        markOn: function (id, text, regexpPattern, color) {
           const self = this;
-          const separator = "[REOP-array-separator]",
-            t = H.innerHTML
-              .replace(new RegExp("(<)", "ig"), separator + "$1")
-              .replace(new RegExp("(>)", "ig"), "$1" + separator)
-              .split(separator);
-          for (let i = 0; i < t.length; i++) {
-            if (t[i].substr(0, 1) == "<") {
+          const separator = "[REOP-array-separator]";
+          const texts = editedHTML.innerHTML
+            .replace(new RegExp("(<)", "ig"), separator + "$1")
+            .replace(new RegExp("(>)", "ig"), "$1" + separator)
+            .split(separator);
+          for (let i = 0; i < texts.length; i++) {
+            if (texts[i].substring(0, 1) == "<") {
               //do nothing for HTML tags
             } else {
-              t.splice(
+              // 文字実体参照 character entity reference e.g. &nbsp; &lt;
+              texts.splice(
                 i,
                 1,
-                t[i]
+                texts[i]
                   .replace(
-                    new RegExp("(&.{2,4};)", "ig"),
+                    new RegExp("(&w+;)", "ig"),
                     separator + "$1" + separator
                   )
                   .split(separator)
               );
-              for (let j = 0; j < t[i].length; j++) {
-                if (t[i][j].substr(0, 1) != "&") {
-                  t[i][j] = t[i][j].replace(
-                    new RegExp("(" + self.textType + ")", "ig"),
+              for (let j = 0; j < texts[i].length; j++) {
+                if (texts[i][j].substring(0, 1) != "&") {
+                  texts[i][j] = texts[i][j].replace(
+                    new RegExp("(" + self.regexpPattern + ")", "ig"),
                     '<span class="' + self.id + '">$1</span>'
                   );
                 }
               }
-              t[i] = t[i].join("");
+              texts[i] = texts[i].join("");
             }
           }
-          H.innerHTML = t.join("");
+          editedHTML.innerHTML = texts.join("");
         },
-        markOff: function (id, text, textType, color) {
+        markOff: function (id, text, regexpPattern, color) {
           const self = this;
-          H.innerHTML = H.innerHTML.replace(
+          editedHTML.innerHTML = editedHTML.innerHTML.replace(
             new RegExp(
-              '<span class="' + self.id + '">(' + self.textType + ")</span>",
+              '<span class="' +
+                self.id +
+                '">(' +
+                self.regexpPattern +
+                ")</span>",
               "ig"
             ),
             "$1"
@@ -125,15 +133,10 @@ window.onload = () => {
           styleElm.innerHTML +=
             ".REOP-ctrl div{margin:0 -10px 10px;padding:2px;background:#333;cursor:move;text-align:right;border-radius:3px;}.REOP-ctrl span{cursor:pointer;}";
           document.head.appendChild(styleElm);
-          document.body.innerHTML =
-            '<div id="REOP-HighLightArea">' +
-            document.body.innerHTML +
-            "</div>";
-          H = document.getElementById("REOP-HighLightArea");
-          document.body.insertBefore(self.elem, H);
+          document.body.insertBefore(self.elem, editedHTML);
           self.elem.innerHTML =
             '<div class="movable_controller"><span id="REOP-close">閉じる</span></div>';
-          for (var i = 0; i < patterns.length; i++) {
+          for (let i = 0; i < patterns.length; i++) {
             self.elem.appendChild(patterns[i].elem);
           }
         };
