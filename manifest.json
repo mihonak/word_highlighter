@@ -4,7 +4,6 @@
   "description": "Base Level Extension",
   "version": "1.0",
   "action": {
-    "default_popup": "hello.html",
     "default_icon": "hello_extensions.png"
   },
   "background": {
@@ -19,5 +18,5 @@
       "run_at": "document_end"
     }
   ],
-  "permissions": ["activeTab", "scripting"]
+  "permissions": ["activeTab", "scripting", "tabs"]
 }
