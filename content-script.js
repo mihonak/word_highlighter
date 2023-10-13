@@ -9,15 +9,14 @@ chrome.runtime.onMessage.addListener((request) => {
 
   //Marker class (prototype)
   /*-------------------------------------------------------------------*/
-  const Marker = function (id, keyword, regexpPattern, color) {
-    this.initialize(id, keyword, regexpPattern, color);
+  const Marker = function (id, keyword, regexpPattern) {
+    this.initialize(id, keyword, regexpPattern);
   };
   Marker.prototype = {
-    initialize: function (id, keyword, regexpPattern, color) {
+    initialize: function (id, keyword, regexpPattern) {
       this.id = id;
       this.keyword = keyword;
       this.regexpPattern = regexpPattern;
-      this.color = color;
       this.check = document.createElement("input");
       this.check.id = id;
       this.check.type = "checkbox";
@@ -37,7 +36,7 @@ chrome.runtime.onMessage.addListener((request) => {
         }
       };
     },
-    markOn: function (id, keyword, regexpPattern, color) {
+    markOn: function () {
       const self = this;
       const separator = "[REOP-array-separator]";
       const texts = editedHTML.innerHTML
@@ -69,7 +68,7 @@ chrome.runtime.onMessage.addListener((request) => {
       }
       editedHTML.innerHTML = texts.join("");
     },
-    markOff: function (id, text, regexpPattern, color) {
+    markOff: function () {
       const self = this;
       editedHTML.innerHTML = editedHTML.innerHTML.replace(
         new RegExp(
@@ -82,12 +81,11 @@ chrome.runtime.onMessage.addListener((request) => {
   };
   const patterns = [];
   words.map((word, index) => {
-    patterns[index] = new Marker("REOP" + (index + 1), word, word, "#f99");
+    patterns[index] = new Marker("REOP" + (index + 1), word, word);
   });
 
   for (let i = 0; i < patterns.length; i++) {
-    styleElm.innerHTML +=
-      "span." + patterns[i].id + "{background:" + patterns[i].color + ";}";
+    styleElm.innerHTML += "span." + patterns[i].id + "{background:#f99;}";
   }
 
   //Panel class (constructor)
