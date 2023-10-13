@@ -9,18 +9,17 @@ chrome.runtime.onMessage.addListener((request) => {
 
   //Marker class (prototype)
   /*-------------------------------------------------------------------*/
-  const Marker = function (id, keyword, regexpPattern) {
-    this.initialize(id, keyword, regexpPattern);
+  const Marker = function (id, keyword) {
+    this.initialize(id, keyword);
   };
   Marker.prototype = {
-    initialize: function (id, keyword, regexpPattern) {
+    initialize: function (id, keyword) {
       this.id = id;
       this.keyword = keyword;
-      this.regexpPattern = regexpPattern;
       this.check = document.createElement("input");
       this.check.id = id;
       this.check.type = "checkbox";
-      this.check.value = regexpPattern;
+      this.check.value = keyword;
       this.label = document.createElement("label");
       this.label.setAttribute("for", id);
       this.label.innerHTML = keyword;
@@ -58,7 +57,7 @@ chrome.runtime.onMessage.addListener((request) => {
           for (let j = 0; j < texts[i].length; j++) {
             if (texts[i][j].substring(0, 1) != "&") {
               texts[i][j] = texts[i][j].replace(
-                new RegExp("(" + self.regexpPattern + ")", "ig"),
+                new RegExp("(" + self.keyword + ")", "ig"),
                 '<span class="' + self.id + '">$1</span>'
               );
             }
@@ -72,7 +71,7 @@ chrome.runtime.onMessage.addListener((request) => {
       const self = this;
       editedHTML.innerHTML = editedHTML.innerHTML.replace(
         new RegExp(
-          '<span class="' + self.id + '">(' + self.regexpPattern + ")</span>",
+          '<span class="' + self.id + '">(' + self.keyword + ")</span>",
           "ig"
         ),
         "$1"
@@ -81,7 +80,7 @@ chrome.runtime.onMessage.addListener((request) => {
   };
   const patterns = [];
   words.map((word, index) => {
-    patterns[index] = new Marker("REOP" + (index + 1), word, word);
+    patterns[index] = new Marker("REOP" + (index + 1), word);
   });
 
   for (let i = 0; i < patterns.length; i++) {
