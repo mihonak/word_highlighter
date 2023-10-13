@@ -1,3 +1,36 @@
-/* p {
-  color: darkslateblue;
-} */
+span.word-highlighter-keywords {
+  background: #f99;
+}
+.word-highlighter-panel {
+  position: fixed;
+  top: 10px;
+  right: 10px;
+  z-index: 9998;
+  width: 200px;
+  padding: 0 10px 10px;
+  text-align: left;
+  color: #fff;
+  background: #000;
+  opacity: 0.7;
+  box-shadow: 0 3px 7px rgba(0, 0, 0, 0.6);
+  border-radius: 3px;
+}
+.word-highlighter-panel p {
+  margin: 5px 0;
+}
+.word-highlighter-panel input,
+.word-highlighter-panel label {
+  margin-right: 5px;
+  vertical-align: middle;
+}
+.word-highlighter-panel div {
+  margin: 0 -10px 10px;
+  padding: 2px;
+  background: #333;
+  cursor: move;
+  text-align: right;
+  border-radius: 3px;
+}
+.word-highlighter-panel span {
+  cursor: pointer;
+}
