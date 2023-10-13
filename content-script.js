@@ -16,24 +16,10 @@ chrome.runtime.onMessage.addListener((request) => {
     initialize: function (id, keyword) {
       this.id = id;
       this.keyword = keyword;
-      this.check = document.createElement("input");
-      this.check.id = id;
-      this.check.type = "checkbox";
-      this.check.value = keyword;
-      this.label = document.createElement("label");
-      this.label.setAttribute("for", id);
-      this.label.innerHTML = keyword;
       this.elem = document.createElement("p");
-      this.elem.appendChild(this.check);
-      this.elem.appendChild(this.label);
+      this.elem.innerHTML = keyword;
       const self = this;
-      this.check.onclick = function () {
-        if (this.checked) {
-          self.markOn();
-        } else {
-          self.markOff();
-        }
-      };
+      self.markOn();
     },
     markOn: function () {
       const self = this;
