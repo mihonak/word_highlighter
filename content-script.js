@@ -5,8 +5,20 @@ chrome.runtime.onMessage.addListener((request) => {
   document.body.innerHTML =
     '<div id="REOP-HighLightArea">' + document.body.innerHTML + "</div>";
   let editedHTML = document.getElementById("REOP-HighLightArea");
+
   const styleElm = document.createElement("style");
   styleElm.innerHTML += "span.word-highlighter{background:#f99;}";
+  styleElm.innerHTML +=
+    ".REOP-ctrl{position:fixed;top:10px;right:10px;z-index:9998;width:200px;padding:0 10px 10px;text-align:left;color:#fff;background:#000;opacity:0.7;box-shadow: 0 3px 7px rgba(0, 0, 0, 0.6);border-radius:3px;}";
+  styleElm.innerHTML +=
+    ".REOP-ctrl p{margin:5px 0;}.REOP-ctrl input,.REOP-ctrl label{margin-right:5px;vertical-align:middle;}";
+  styleElm.innerHTML +=
+    ".REOP-ctrl div{margin:0 -10px 10px;padding:2px;background:#333;cursor:move;text-align:right;border-radius:3px;}.REOP-ctrl span{cursor:pointer;}";
+  document.head.appendChild(styleElm);
+
+  const panelElm = document.createElement("div");
+  panelElm.className = "REOP-ctrl";
+  document.body.insertBefore(panelElm, editedHTML);
 
   class highlight {
     constructor(keyword, htmlSrc) {
@@ -57,25 +69,7 @@ chrome.runtime.onMessage.addListener((request) => {
     );
   });
 
-  class Panel {
-    constructor() {
-      this.elem = document.createElement("div");
-      this.elem.className = "REOP-ctrl";
-    }
-    create() {
-      styleElm.innerHTML +=
-        ".REOP-ctrl{position:fixed;top:10px;right:10px;z-index:9998;width:200px;padding:0 10px 10px;text-align:left;color:#fff;background:#000;opacity:0.7;box-shadow: 0 3px 7px rgba(0, 0, 0, 0.6);border-radius:3px;}";
-      styleElm.innerHTML +=
-        ".REOP-ctrl p{margin:5px 0;}.REOP-ctrl input,.REOP-ctrl label{margin-right:5px;vertical-align:middle;}";
-      styleElm.innerHTML +=
-        ".REOP-ctrl div{margin:0 -10px 10px;padding:2px;background:#333;cursor:move;text-align:right;border-radius:3px;}.REOP-ctrl span{cursor:pointer;}";
-      document.head.appendChild(styleElm);
-      document.body.insertBefore(this.elem, editedHTML);
-      for (let i = 0; i < patterns.length; i++) {
-        this.elem.appendChild(patterns[i].elem);
-      }
-    }
+  for (let i = 0; i < patterns.length; i++) {
+    panelElm.appendChild(patterns[i].elem);
   }
-  const panel = new Panel();
-  panel.create();
 });
