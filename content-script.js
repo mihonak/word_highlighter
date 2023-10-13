@@ -9,13 +9,13 @@ chrome.runtime.onMessage.addListener((request) => {
 
   //Marker class (prototype)
   /*-------------------------------------------------------------------*/
-  const Marker = function (id, text, regexpPattern, color) {
-    this.initialize(id, text, regexpPattern, color);
+  const Marker = function (id, keyword, regexpPattern, color) {
+    this.initialize(id, keyword, regexpPattern, color);
   };
   Marker.prototype = {
-    initialize: function (id, text, regexpPattern, color) {
+    initialize: function (id, keyword, regexpPattern, color) {
       this.id = id;
-      this.text = text;
+      this.keyword = keyword;
       this.regexpPattern = regexpPattern;
       this.color = color;
       this.check = document.createElement("input");
@@ -24,7 +24,7 @@ chrome.runtime.onMessage.addListener((request) => {
       this.check.value = regexpPattern;
       this.label = document.createElement("label");
       this.label.setAttribute("for", id);
-      this.label.innerHTML = text;
+      this.label.innerHTML = keyword;
       this.elem = document.createElement("p");
       this.elem.appendChild(this.check);
       this.elem.appendChild(this.label);
@@ -37,7 +37,7 @@ chrome.runtime.onMessage.addListener((request) => {
         }
       };
     },
-    markOn: function (id, text, regexpPattern, color) {
+    markOn: function (id, keyword, regexpPattern, color) {
       const self = this;
       const separator = "[REOP-array-separator]";
       const texts = editedHTML.innerHTML
@@ -81,11 +81,9 @@ chrome.runtime.onMessage.addListener((request) => {
     },
   };
   const patterns = [];
-  patterns[0] = new Marker("REOP1", "アルファベット", "[a-z]+", "#9f9");
-  patterns[1] = new Marker("REOP2", "カタカナ", "[ァ-タダ-ヶー]+", "#99f");
-  patterns[2] = new Marker("REOP3", "半角スペース", " +", "#f99");
-  patterns[3] = new Marker("REOP4", "全角スペース", "　+", "#ee0");
-  patterns[4] = new Marker("REOP5", "半角数字", "[0-9]+", "#6ee");
+  words.map((word, index) => {
+    patterns[index] = new Marker("REOP" + (index + 1), word, word, "#f99");
+  });
 
   for (let i = 0; i < patterns.length; i++) {
     styleElm.innerHTML +=
