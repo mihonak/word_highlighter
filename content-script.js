@@ -6,25 +6,19 @@ chrome.runtime.onMessage.addListener((request) => {
     '<div id="REOP-HighLightArea">' + document.body.innerHTML + "</div>";
   let editedHTML = document.getElementById("REOP-HighLightArea");
   const styleElm = document.createElement("style");
+  styleElm.innerHTML += "span.word-highlighter{background:#f99;}";
 
-  //Marker class (prototype)
-  /*-------------------------------------------------------------------*/
-  const Marker = function (id, keyword) {
-    this.initialize(id, keyword);
-  };
-  Marker.prototype = {
-    initialize: function (id, keyword) {
-      this.id = id;
+  class highlight {
+    constructor(keyword, htmlSrc) {
       this.keyword = keyword;
       this.elem = document.createElement("p");
       this.elem.innerHTML = keyword;
-      const self = this;
-      self.markOn();
-    },
-    markOn: function () {
-      const self = this;
+      this.htmlSrc = htmlSrc;
+      this.highlightOn();
+    }
+    highlightOn() {
       const separator = "[REOP-array-separator]";
-      const texts = editedHTML.innerHTML
+      const texts = this.htmlSrc.innerHTML
         .replace(new RegExp("(<)", "ig"), separator + "$1")
         .replace(new RegExp("(>)", "ig"), "$1" + separator)
         .split(separator);
@@ -43,43 +37,32 @@ chrome.runtime.onMessage.addListener((request) => {
           for (let j = 0; j < texts[i].length; j++) {
             if (texts[i][j].substring(0, 1) != "&") {
               texts[i][j] = texts[i][j].replace(
-                new RegExp("(" + self.keyword + ")", "ig"),
-                '<span class="' + self.id + '">$1</span>'
+                new RegExp("(" + this.keyword + ")", "ig"),
+                '<span class="word-highlighter">$1</span>'
               );
             }
           }
           texts[i] = texts[i].join("");
         }
       }
-      editedHTML.innerHTML = texts.join("");
-    },
-    markOff: function () {
-      const self = this;
-      editedHTML.innerHTML = editedHTML.innerHTML.replace(
-        new RegExp(
-          '<span class="' + self.id + '">(' + self.keyword + ")</span>",
-          "ig"
-        ),
-        "$1"
-      );
-    },
-  };
+      this.htmlSrc.innerHTML = texts.join("");
+    }
+    highlightOff() {}
+  }
   const patterns = [];
   words.map((word, index) => {
-    patterns[index] = new Marker("REOP" + (index + 1), word);
+    patterns[index] = new highlight(
+      word,
+      document.getElementById("REOP-HighLightArea")
+    );
   });
 
-  for (let i = 0; i < patterns.length; i++) {
-    styleElm.innerHTML += "span." + patterns[i].id + "{background:#f99;}";
-  }
-
-  //Panel class (constructor)
-  /*-------------------------------------------------------------------*/
-  const Panel = function () {
-    this.elem = document.createElement("div");
-    this.elem.className = "REOP-ctrl";
-    this.create = function () {
-      const self = this;
+  class Panel {
+    constructor() {
+      this.elem = document.createElement("div");
+      this.elem.className = "REOP-ctrl";
+    }
+    create() {
       styleElm.innerHTML +=
         ".REOP-ctrl{position:fixed;top:10px;right:10px;z-index:9998;width:200px;padding:0 10px 10px;text-align:left;color:#fff;background:#000;opacity:0.7;box-shadow: 0 3px 7px rgba(0, 0, 0, 0.6);border-radius:3px;}";
       styleElm.innerHTML +=
@@ -87,12 +70,12 @@ chrome.runtime.onMessage.addListener((request) => {
       styleElm.innerHTML +=
         ".REOP-ctrl div{margin:0 -10px 10px;padding:2px;background:#333;cursor:move;text-align:right;border-radius:3px;}.REOP-ctrl span{cursor:pointer;}";
       document.head.appendChild(styleElm);
-      document.body.insertBefore(self.elem, editedHTML);
+      document.body.insertBefore(this.elem, editedHTML);
       for (let i = 0; i < patterns.length; i++) {
-        self.elem.appendChild(patterns[i].elem);
+        this.elem.appendChild(patterns[i].elem);
       }
-    };
-  };
+    }
+  }
   const panel = new Panel();
   panel.create();
 });
