@@ -52,37 +52,40 @@ class highlight {
     this.highlightOn();
   }
   highlightOn() {
+    // HTMLタグとそれ以外のテキストの間で区切り
+    // 文字実体参照（character entity reference e.g. &nbsp; &lt;）
+    // とそれ以外のテキストの間でさらに区切る
     const separator = "[word-highlighter-array-separator]";
-    const texts = this.htmlSrc.innerHTML
-      .replace(new RegExp("(<)", "ig"), separator + "$1")
-      .replace(new RegExp("(>)", "ig"), "$1" + separator)
+    const tagsAndTexts = this.htmlSrc.innerHTML
+      .replace(new RegExp("(<)", "ig"), `${separator}$1`)
+      .replace(new RegExp("(>)", "ig"), `$1${separator}`)
+      .replace(new RegExp("(&w+;)", "ig"), `${separator}$1${separator}`)
       .split(separator);
-    for (let i = 0; i < texts.length; i++) {
-      if (texts[i].substring(0, 1) != "<") {
-        // 文字実体参照 character entity reference e.g. &nbsp; &lt;
-        texts.splice(
-          i,
-          1,
-          texts[i]
-            .replace(new RegExp("(&w+;)", "ig"), separator + "$1" + separator)
-            .split(separator)
-        );
-        for (let j = 0; j < texts[i].length; j++) {
-          if (texts[i][j].substring(0, 1) != "&") {
-            const re = new RegExp(this.keyword, "g");
-            this.count +=
-              texts[i][j].match(re) === null ? 0 : texts[i][j].match(re).length;
 
-            texts[i][j] = texts[i][j].replace(
-              new RegExp("(" + this.keyword + ")", "ig"),
-              '<span class="word-highlighter-keywords">$1</span>'
-            );
-          }
-        }
-        texts[i] = texts[i].join("");
+    const editedTexts = [];
+
+    tagsAndTexts.map((tagOrText) => {
+      // HTMLタグ・文字実体参照・改行以外のテキストの時だけ検索対象の文字を検出してタグ付けする
+      if (
+        tagOrText.substring(0, 1) == "<" ||
+        tagOrText.substring(0, 1) == "&" ||
+        tagOrText === "\n"
+      ) {
+        editedTexts.push(tagOrText);
+      } else {
+        // 該当した件数のカウント
+        const re = new RegExp(this.keyword, "g");
+        this.count +=
+          tagOrText.match(re) === null ? 0 : tagOrText.match(re).length;
+
+        editedTexts.push(
+          tagOrText.replace(
+            new RegExp(`(${this.keyword})`, "ig"),
+            '<span class="word-highlighter-keywords">$1</span>'
+          )
+        );
       }
-    }
-    this.htmlSrc.innerHTML = texts.join("");
+    });
+    this.htmlSrc.innerHTML = editedTexts.join("");
   }
-  highlightOff() {}
 }
