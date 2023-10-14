@@ -1,5 +1,19 @@
 chrome.runtime.onMessage.addListener((request) => {
   console.log(request.status);
+
+  // ページ全体を検索対象として一括りにする
+  document.body.innerHTML =
+    '<div id="word-highlighter-target-area">' +
+    document.body.innerHTML +
+    "</div>";
+  let editedHTML = document.getElementById("word-highlighter-target-area");
+
+  // 検索結果を表示するパネルは検索対象の外側に設置
+  const panelElm = document.createElement("div");
+  panelElm.className = "word-highlighter-panel";
+  document.body.insertBefore(panelElm, editedHTML);
+
+  // キーワード毎にhighlightクラスを実行
   const words = [
     "英語",
     "英会話",
@@ -9,17 +23,6 @@ chrome.runtime.onMessage.addListener((request) => {
     "外国",
     "外資",
   ];
-
-  document.body.innerHTML =
-    '<div id="word-highlighter-target-area">' +
-    document.body.innerHTML +
-    "</div>";
-  let editedHTML = document.getElementById("word-highlighter-target-area");
-
-  const panelElm = document.createElement("div");
-  panelElm.className = "word-highlighter-panel";
-  document.body.insertBefore(panelElm, editedHTML);
-
   const patterns = [];
   words.map((word, index) => {
     patterns[index] = new highlight(
@@ -28,6 +31,7 @@ chrome.runtime.onMessage.addListener((request) => {
     );
   });
 
+  // パネルにキーワードと件数を挿入する
   for (let i = 0; i < patterns.length; i++) {
     panelElm.appendChild(patterns[i].elem);
   }
