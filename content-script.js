@@ -1,6 +1,11 @@
 chrome.runtime.onMessage.addListener((request) => {
   console.log(request.status);
 
+  // この要素が既にあったら実行済みと判断して処理を止める
+  if (document.getElementById("word-highlighter-target-area")) {
+    return;
+  }
+
   // ページ全体を検索対象として一括りにする
   document.body.innerHTML =
     '<div id="word-highlighter-target-area">' +
