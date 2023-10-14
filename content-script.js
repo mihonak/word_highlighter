@@ -1,6 +1,14 @@
 chrome.runtime.onMessage.addListener((request) => {
   console.log(request.status);
-  const words = ["英語", "英会話", "TOEIC", "グローバル", "海外", "外国"];
+  const words = [
+    "英語",
+    "英会話",
+    "TOEIC",
+    "グローバル",
+    "海外",
+    "外国",
+    "外資",
+  ];
 
   document.body.innerHTML =
     '<div id="word-highlighter-target-area">' +
@@ -31,6 +39,7 @@ class highlight {
     this.elem = document.createElement("p");
     this.elem.innerHTML = keyword;
     this.htmlSrc = htmlSrc;
+    this.counter = 0;
     this.highlightOn();
   }
   highlightOn() {
@@ -53,6 +62,10 @@ class highlight {
         );
         for (let j = 0; j < texts[i].length; j++) {
           if (texts[i][j].substring(0, 1) != "&") {
+            const re = new RegExp(this.keyword, "g");
+            this.counter +=
+              texts[i][j].match(re) === null ? 0 : texts[i][j].match(re).length;
+
             texts[i][j] = texts[i][j].replace(
               new RegExp("(" + this.keyword + ")", "ig"),
               '<span class="word-highlighter-keywords">$1</span>'
@@ -63,6 +76,7 @@ class highlight {
       }
     }
     this.htmlSrc.innerHTML = texts.join("");
+    this.elem.innerHTML += " (" + this.counter + "件)";
   }
   highlightOff() {}
 }
