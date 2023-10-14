@@ -37,18 +37,18 @@ chrome.runtime.onMessage.addListener((request) => {
   });
 
   // パネルにキーワードと件数を挿入する
-  for (let i = 0; i < patterns.length; i++) {
-    panelElm.appendChild(patterns[i].elem);
-  }
+  patterns.map((pattern) => {
+    const pElem = document.createElement("p");
+    pElem.innerHTML = `${pattern.keyword} (${pattern.count}件)`;
+    panelElm.appendChild(pElem);
+  });
 });
 
 class highlight {
   constructor(keyword, htmlSrc) {
     this.keyword = keyword;
-    this.elem = document.createElement("p");
-    this.elem.innerHTML = keyword;
     this.htmlSrc = htmlSrc;
-    this.counter = 0;
+    this.count = 0;
     this.highlightOn();
   }
   highlightOn() {
@@ -58,9 +58,7 @@ class highlight {
       .replace(new RegExp("(>)", "ig"), "$1" + separator)
       .split(separator);
     for (let i = 0; i < texts.length; i++) {
-      if (texts[i].substring(0, 1) == "<") {
-        //do nothing for HTML tags
-      } else {
+      if (texts[i].substring(0, 1) != "<") {
         // 文字実体参照 character entity reference e.g. &nbsp; &lt;
         texts.splice(
           i,
@@ -72,7 +70,7 @@ class highlight {
         for (let j = 0; j < texts[i].length; j++) {
           if (texts[i][j].substring(0, 1) != "&") {
             const re = new RegExp(this.keyword, "g");
-            this.counter +=
+            this.count +=
               texts[i][j].match(re) === null ? 0 : texts[i][j].match(re).length;
 
             texts[i][j] = texts[i][j].replace(
@@ -85,7 +83,6 @@ class highlight {
       }
     }
     this.htmlSrc.innerHTML = texts.join("");
-    this.elem.innerHTML += " (" + this.counter + "件)";
   }
   highlightOff() {}
 }
